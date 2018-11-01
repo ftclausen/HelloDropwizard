@@ -2,6 +2,12 @@
 
 Just my version of the Dropwizard hello world exercise. Typing it out to learn and also using Gradle
 
+### Run Me
+
+```
+./gradlew run --args="server hello-world.yml"
+```
+
 ### Notes
 
 We have several types of classes
