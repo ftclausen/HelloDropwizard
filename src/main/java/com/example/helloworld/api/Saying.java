@@ -6,6 +6,8 @@ package com.example.helloworld.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.Objects;
+
 public class Saying {
   private long id;
 
@@ -32,4 +34,22 @@ public class Saying {
   }
 
   // QQ: Why no setters? Because id and content are set at object creation by the constructor
+
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+
+    if (!(o instanceof Saying)) {
+      return false;
+    }
+
+    Saying that = (Saying)o;
+    return this.id == that.id && this.content.equals(that.content);
+  }
+
+  public int hashCode() {
+    return Objects.hash(id, content);
+  }
+
 }
