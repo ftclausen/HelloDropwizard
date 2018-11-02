@@ -52,4 +52,8 @@ public class Saying {
     return Objects.hash(id, content);
   }
 
+  public String toString() {
+    return "id: " + id + ", content: " + content;
+  }
+
 }

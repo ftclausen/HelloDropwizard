@@ -24,9 +24,8 @@ public class HelloWorldApplicationTest {
   private final HelloWorldConfiguration config = new HelloWorldConfiguration();
   private final Saying saying = new Saying(1, "fred");
 
- // private final HelloWorldResource resource = new HelloWorldResource("template", "fred");
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
-  private static final String template = "template: Hello, %s\nname: fred";
+  private static final String template = "%s";
   @ClassRule
   public static final ResourceTestRule resources = ResourceTestRule.builder()
           .addResource(new HelloWorldResource(template, "fred"))
@@ -41,6 +40,7 @@ public class HelloWorldApplicationTest {
   public void serializesToJSON() throws Exception {
     // Make a reference saying object
     // *Deserialise* reference JSON and then immediately serialise it again to get reference string
+    // TODO: DRY candidate
     final String expected = MAPPER.writeValueAsString(MAPPER.readValue(fixture("fixtures/hello-world.json"),
             Saying.class));
 
@@ -65,16 +65,12 @@ public class HelloWorldApplicationTest {
 
   // In a real app this could use a JSON fixture of the expected response
   @Test
-  public void testGetHelloWorld() {
-    assertThat(resources.client().target("/hello-world").request().get(Saying.class)).isEqualTo(saying);
-  }
+  public void testGetHelloWorld() throws Exception {
+    // TODO: DRY candidate
+    final String expected = MAPPER.writeValueAsString(MAPPER.readValue(fixture("fixtures/hello-world.json"),
+            Saying.class));
+    final Saying sayingFromService = resources.client().target("/hello-world").request().get(Saying.class);
 
-  /*
-  @Test
-  public void checkDefaultName() throws Exception {
-    application.run(config, environment);
-
-    assertThat(resource.sayHello(Optional.empty()), is("fred"));
+    assertThat(MAPPER.writeValueAsString(sayingFromService)).isEqualTo(expected);
   }
-  */
 }
