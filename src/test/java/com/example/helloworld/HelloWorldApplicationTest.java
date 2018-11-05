@@ -1,24 +1,24 @@
 package com.example.helloworld;
 
+import com.codahale.metrics.MetricRegistry;
 import com.example.helloworld.api.Saying;
-import com.example.helloworld.health.TemplateHealthCheck;
 import com.example.helloworld.resources.HelloWorldResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.testing.junit.ResourceTestRule;
-import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static io.dropwizard.testing.FixtureHelpers.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 public class HelloWorldApplicationTest {
-  private final Environment environment = mock(Environment.class);
+  private final Environment environment = new Environment("template", new ObjectMapper(), null,
+                                          new MetricRegistry(), null);
   private final JerseyEnvironment jersey = mock(JerseyEnvironment.class);
   private final HelloWorldApplication application = new HelloWorldApplication();
   private final HelloWorldConfiguration config = new HelloWorldConfiguration();
@@ -31,16 +31,10 @@ public class HelloWorldApplicationTest {
           .addResource(new HelloWorldResource(template, "fred"))
           .build();
 
-  @Before
-  public void setup() throws Exception {
-    when(environment.jersey()).thenReturn(jersey);
-  }
-
   @Test
   public void serializesToJSON() throws Exception {
     // Make a reference saying object
     // *Deserialise* reference JSON and then immediately serialise it again to get reference string
-    // TODO: DRY candidate
     final String expected = MAPPER.writeValueAsString(MAPPER.readValue(fixture("fixtures/hello-world.json"),
             Saying.class));
 
@@ -56,21 +50,13 @@ public class HelloWorldApplicationTest {
   }
 
   @Test
-  public void buildsAHelloWorldResource() throws Exception {
+  public void verifyEndpoints() {
     config.setName("fred");
     application.run(config, environment);
+    final Set<String> healthList = environment.healthChecks().getNames();
+    final String endpointsInfo = environment.jersey().getResourceConfig().getEndpointsInfo();
 
-    verify(jersey).register(isA(HelloWorldResource.class));
-  }
-
-  // In a real app this could use a JSON fixture of the expected response
-  @Test
-  public void testGetHelloWorld() throws Exception {
-    // TODO: DRY candidate
-    final String expected = MAPPER.writeValueAsString(MAPPER.readValue(fixture("fixtures/hello-world.json"),
-            Saying.class));
-    final Saying sayingFromService = resources.client().target("/hello-world").request().get(Saying.class);
-
-    assertThat(MAPPER.writeValueAsString(sayingFromService)).isEqualTo(expected);
+    assertThat(healthList).containsExactlyInAnyOrder("deadlocks", "template");
+    assertThat(endpointsInfo).contains("/hello-world");
   }
 }

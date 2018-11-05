@@ -30,8 +30,8 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
             configuration.getTemplate(),
             configuration.getName()
     );
-    // final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
-    // environment.healthChecks().register("template", healthCheck);
+    final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
+    environment.healthChecks().register("template", healthCheck);
     environment.jersey().register(resource);
   }
 }
