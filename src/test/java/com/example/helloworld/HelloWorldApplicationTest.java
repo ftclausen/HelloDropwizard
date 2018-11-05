@@ -12,9 +12,10 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static io.dropwizard.testing.FixtureHelpers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.*;
 
 public class HelloWorldApplicationTest {
   private final Environment environment = new Environment("template", new ObjectMapper(), null,
@@ -38,7 +39,7 @@ public class HelloWorldApplicationTest {
     final String expected = MAPPER.writeValueAsString(MAPPER.readValue(fixture("fixtures/hello-world.json"),
             Saying.class));
 
-    assertThat(MAPPER.writeValueAsString(saying)).isEqualTo(expected);
+    assertThat(MAPPER.writeValueAsString(saying), equalTo(expected));
   }
 
   @Test
@@ -46,7 +47,7 @@ public class HelloWorldApplicationTest {
     final Saying saying = new Saying(1, "fred");
 
     // Deserialise the reference JSON into a Saying class and compare directly to our saying class above
-    assertThat(MAPPER.readValue(fixture("fixtures/hello-world.json"), Saying.class)).isEqualTo(saying);
+    assertThat(MAPPER.readValue(fixture("fixtures/hello-world.json"), Saying.class), equalTo(saying));
   }
 
   @Test
@@ -56,7 +57,7 @@ public class HelloWorldApplicationTest {
     final Set<String> healthList = environment.healthChecks().getNames();
     final String endpointsInfo = environment.jersey().getResourceConfig().getEndpointsInfo();
 
-    assertThat(healthList).containsExactlyInAnyOrder("deadlocks", "template");
-    assertThat(endpointsInfo).contains("/hello-world");
+    assertThat(healthList, contains("deadlocks", "template"));
+    assertThat(endpointsInfo, containsString("/hello-world"));
   }
 }
