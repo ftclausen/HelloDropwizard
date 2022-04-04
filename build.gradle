@@ -14,6 +14,12 @@ versions.dropwizard = '2.0.28'
 
 dependencies {
   compile "io.dropwizard:dropwizard-core:$versions.dropwizard"
+  testCompile "io.dropwizard:dropwizard-testing:$versions.dropwizard",
+              'org.junit.jupiter:junit-jupiter:5.8.2'
+}
+
+test {
+  useJUnitPlatform()
 }
 
 mainClassName = 'com.example.helloworld.HelloWorldApplication'
