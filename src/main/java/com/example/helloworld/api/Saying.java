@@ -1,4 +1,7 @@
 package com.example.helloworld.api;
+/*
+ * This is a Dropwizard representation class.
+ */
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

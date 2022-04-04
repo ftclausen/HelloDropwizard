@@ -5,7 +5,7 @@ Just my version of the Dropwizard hello world exercise. Typing it out to learn a
 ### Run Me
 
 ```
-./gradlew run --args="server hello-world.yml"
+./gradlew run --args="server example.yml"
 ```
 
 ### Notes
